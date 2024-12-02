@@ -20,6 +20,7 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 300px;
+            text-align: center;
         }
         .form-group {
             margin-bottom: 15px;
@@ -53,25 +54,18 @@
         button:hover {
             background-color: #45a049;
         }
-        .extra-fields {
-            display: none;
-        }
-        .mensaje-cumple {
-            color: #FF5722;
-            font-weight: bold;
-            text-align: center;
-            margin-top: 10px;
-        }
         .switch-container {
             text-align: center;
             margin-top: 15px;
             font-size: 14px;
         }
-        .switch-container button {
-            background-color: #008CBA;
+        .hidden {
+            display: none;
         }
-        .switch-container button:hover {
-            background-color: #007BB5;
+        #birthdayMessage {
+            font-size: 20px;
+            font-weight: bold;
+            color: #FF5722;
         }
     </style>
     <script>
@@ -85,67 +79,35 @@
 
         function mostrarCamposAdicionales() {
             const tipoUsuario = document.getElementById("tipoUsuario").value;
-            const camposTurista = document.getElementById("camposTurista");
-            const camposGuia = document.getElementById("camposGuia");
-
-            if (tipoUsuario === "turista") {
-                camposTurista.style.display = "block";
-                camposGuia.style.display = "none";
-            } else if (tipoUsuario === "guia") {
-                camposTurista.style.display = "none";
-                camposGuia.style.display = "block";
-            } else {
-                camposTurista.style.display = "none";
-                camposGuia.style.display = "none";
-            }
+            document.getElementById("camposTurista").style.display = tipoUsuario === "turista" ? "block" : "none";
+            document.getElementById("camposGuia").style.display = tipoUsuario === "guia" ? "block" : "none";
         }
 
         function registrarUsuario(event) {
             event.preventDefault();
-
             const nombre = document.getElementById("nombre").value;
             const fechaNacimiento = new Date(document.getElementById("fechaNacimiento").value);
             const email = document.getElementById("email").value;
             const password = document.getElementById("password").value;
             const tipoUsuario = document.getElementById("tipoUsuario").value;
 
-            let datosAdicionales = {};
-            if (tipoUsuario === "turista") {
-                datosAdicionales.nacionalidad = document.getElementById("nacionalidad").value;
-            } else if (tipoUsuario === "guia") {
-                datosAdicionales.experiencia = document.getElementById("experiencia").value;
-                datosAdicionales.idiomas = document.getElementById("idiomas").value;
-            }
-
             const usuario = {
                 nombre,
                 fechaNacimiento: fechaNacimiento.toISOString(),
                 email,
                 password,
-                tipoUsuario,
-                ...datosAdicionales
+                tipoUsuario
             };
 
-            // Guardar usuario en localStorage
-            let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+            const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
             usuarios.push(usuario);
             localStorage.setItem("usuarios", JSON.stringify(usuarios));
-
-            // Mostrar mensaje de cumpleaños si coincide con la fecha actual
-            const hoy = new Date();
-            if (fechaNacimiento.getDate() === hoy.getDate() && fechaNacimiento.getMonth() === hoy.getMonth()) {
-                document.getElementById("mensajeCumple").innerText = `¡Feliz cumpleaños, ${nombre}!`;
-            } else {
-                document.getElementById("mensajeCumple").innerText = "";
-            }
-
             alert("Registro exitoso.");
             toggleMode();
         }
 
         function iniciarSesion(event) {
             event.preventDefault();
-
             const email = document.getElementById("loginEmail").value;
             const password = document.getElementById("loginPassword").value;
 
@@ -153,14 +115,37 @@
             const usuario = usuarios.find(u => u.email === email && u.password === password);
 
             if (usuario) {
-                alert(`Bienvenido, ${usuario.nombre}!`);
-                if (usuario.tipoUsuario === "turista") {
-                    window.location.href = "https://hyordi12.github.io/Turista/#1-%C2%BFqu%C3%A9-es-las-coloradas";
-                } else if (usuario.tipoUsuario === "guia") {
-                    window.location.href = "https://hyordi12.github.io/Guia/";
-                }
+                verificarCumpleaños(usuario);
             } else {
                 alert("Correo o contraseña incorrectos.");
+            }
+        }
+
+        function verificarCumpleaños(usuario) {
+            const fechaNacimiento = new Date(usuario.fechaNacimiento);
+            const hoy = new Date();
+
+            if (fechaNacimiento.getDate() === hoy.getDate() && fechaNacimiento.getMonth() === hoy.getMonth()) {
+                mostrarPantallaCumpleaños(usuario);
+            } else {
+                redirigirSegunTipo(usuario);
+            }
+        }
+
+        function mostrarPantallaCumpleaños(usuario) {
+            document.body.innerHTML = `
+                <div class="container">
+                    <p id="birthdayMessage">¡Feliz cumpleaños, ${usuario.nombre}!</p>
+                    <button onclick="redirigirSegunTipo(${JSON.stringify(usuario)})">Continuar</button>
+                </div>
+            `;
+        }
+
+        function redirigirSegunTipo(usuario) {
+            if (usuario.tipoUsuario === "turista") {
+                window.location.href = "https://hyordi12.github.io/Turista/#1-%C2%BFqu%C3%A9-es-las-coloradas";
+            } else if (usuario.tipoUsuario === "guia") {
+                window.location.href = "https://hyordi12.github.io/Guia/";
             }
         }
     </script>
@@ -195,27 +180,23 @@
                     <option value="guia">Guía</option>
                 </select>
             </div>
-            <div id="camposTurista" class="extra-fields">
+            <div id="camposTurista" class="hidden">
                 <div class="form-group">
                     <label for="nacionalidad">Nacionalidad:</label>
                     <input type="text" id="nacionalidad">
                 </div>
             </div>
-            <div id="camposGuia" class="extra-fields">
+            <div id="camposGuia" class="hidden">
                 <div class="form-group">
                     <label for="experiencia">Años de Experiencia:</label>
                     <input type="number" id="experiencia" min="0">
-                </div>
-                <div class="form-group">
-                    <label for="idiomas">Idiomas:</label>
-                    <input type="text" id="idiomas" placeholder="Ej: Español, Inglés">
                 </div>
             </div>
             <button type="submit">Registrarse</button>
         </form>
     </div>
 
-    <div id="loginForm" style="display: none;">
+    <div id="loginForm" class="hidden">
         <h2>Iniciar Sesión</h2>
         <form onsubmit="iniciarSesion(event)">
             <div class="form-group">
@@ -233,10 +214,10 @@
     <div class="switch-container">
         <button onclick="toggleMode()">¿Ya tienes cuenta? Inicia Sesión</button>
     </div>
-    <div id="mensajeCumple" class="mensaje-cumple"></div>
 </div>
 
 </body>
 </html>
+
 
 
