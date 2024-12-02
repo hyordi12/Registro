@@ -187,15 +187,13 @@
             </div>
             <button type="submit">Iniciar Sesión</button>
         </form>
-    </div>
-
-    <div class="switch-container">
-        <button onclick="toggleMode()">¿Ya tienes cuenta? Inicia Sesión</button>
+        <button onclick="toggleMode()">Registrarse</button>
     </div>
 </div>
 
 </body>
 </html>
+
 
 
 
