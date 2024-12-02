@@ -34,7 +34,6 @@
         input[type="email"],
         input[type="password"],
         input[type="date"],
-        input[type="number"],
         select {
             width: 100%;
             padding: 8px;
@@ -172,6 +171,7 @@
             </div>
             <button type="submit">Registrarse</button>
         </form>
+        <button onclick="toggleMode()">Iniciar Sesión</button>
     </div>
 
     <div id="loginForm" class="hidden">
@@ -187,7 +187,7 @@
             </div>
             <button type="submit">Iniciar Sesión</button>
         </form>
-        <button onclick="toggleMode()">Registrarse</button>
+        <button onclick="toggleMode()">Registro</button>
     </div>
 </div>
 
