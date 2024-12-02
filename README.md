@@ -33,6 +33,7 @@
         input[type="email"],
         input[type="password"],
         input[type="date"],
+        input[type="number"],
         select {
             width: 100%;
             padding: 8px;
@@ -81,22 +82,48 @@
 
         function registrarUsuario(event) {
             event.preventDefault();
+
             const nombre = document.getElementById("nombre").value;
             const fechaNacimiento = new Date(document.getElementById("fechaNacimiento").value);
-            const hoy = new Date();
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const tipoUsuario = document.getElementById("tipoUsuario").value;
 
-            // Verificar si hoy es el cumpleaños del usuario
+            let datosAdicionales = {};
+            if (tipoUsuario === "turista") {
+                datosAdicionales.nacionalidad = document.getElementById("nacionalidad").value;
+            } else if (tipoUsuario === "guia") {
+                datosAdicionales.experiencia = document.getElementById("experiencia").value;
+                datosAdicionales.idiomas = document.getElementById("idiomas").value;
+            }
+
+            const usuario = {
+                nombre,
+                fechaNacimiento: fechaNacimiento.toISOString(),
+                email,
+                password,
+                tipoUsuario,
+                ...datosAdicionales
+            };
+
+            // Guardar usuario en localStorage
+            let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+            usuarios.push(usuario);
+            localStorage.setItem("usuarios", JSON.stringify(usuarios));
+
+            // Mostrar mensaje de cumpleaños si coincide con la fecha actual
+            const hoy = new Date();
             if (fechaNacimiento.getDate() === hoy.getDate() && fechaNacimiento.getMonth() === hoy.getMonth()) {
                 document.getElementById("mensajeCumple").innerText = `¡Feliz cumpleaños, ${nombre}!`;
             } else {
                 document.getElementById("mensajeCumple").innerText = "";
             }
 
-            const tipoUsuario = document.getElementById("tipoUsuario").value;
+            // Redirigir según el tipo de usuario
             if (tipoUsuario === "turista") {
-                window.location.href = "https://hyordi12.github.io/Turista/#1-%C2%BFqu%C3%A9-es-las-coloradas";  
+                window.location.href = "https://hyordi12.github.io/Turista/#1-%C2%BFqu%C3%A9-es-las-coloradas";
             } else if (tipoUsuario === "guia") {
-                window.location.href = "https://hyordi12.github.io/Guia/";    
+                window.location.href = "https://hyordi12.github.io/Guia/";
             }
         }
     </script>
@@ -162,3 +189,4 @@
 
 </body>
 </html>
+
