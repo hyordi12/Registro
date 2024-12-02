@@ -1,4 +1,5 @@
 
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -56,10 +57,11 @@
         .hidden {
             display: none;
         }
-        #birthdayMessage {
-            font-size: 20px;
-            font-weight: bold;
-            color: #FF5722;
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: -10px;
+            margin-bottom: 10px;
         }
     </style>
     <script>
@@ -79,6 +81,14 @@
             const password = document.getElementById("password").value;
             const tipoUsuario = document.getElementById("tipoUsuario").value;
 
+            const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+
+            // Verificar si el correo ya está registrado
+            if (usuarios.some(u => u.email === email)) {
+                mostrarMensajeError("Correo ya registrado.");
+                return;
+            }
+
             const usuario = {
                 nombre,
                 fechaNacimiento: fechaNacimiento.toISOString(),
@@ -87,11 +97,16 @@
                 tipoUsuario
             };
 
-            const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
             usuarios.push(usuario);
             localStorage.setItem("usuarios", JSON.stringify(usuarios));
             alert("Registro exitoso.");
-            toggleMode();
+            redirigirSegunTipo(usuario);
+        }
+
+        function mostrarMensajeError(mensaje) {
+            const mensajeError = document.getElementById("mensajeError");
+            mensajeError.textContent = mensaje;
+            mensajeError.style.display = "block";
         }
 
         function iniciarSesion(event) {
@@ -124,13 +139,12 @@
             document.body.innerHTML = `
                 <div class="container">
                     <p id="birthdayMessage">¡Feliz cumpleaños, ${usuario.nombre}!</p>
-                    <button onclick="redirigirSegunTipo('${JSON.stringify(usuario).replace(/'/g, "\\'")}')">Continuar</button>
+                    <button onclick='redirigirSegunTipo(${JSON.stringify(usuario)})'>Continuar</button>
                 </div>
             `;
         }
 
         function redirigirSegunTipo(usuario) {
-            usuario = JSON.parse(usuario);
             if (usuario.tipoUsuario === "turista") {
                 window.location.href = "https://hyordi12.github.io/Turista/#1-%C2%BFqu%C3%A9-es-las-coloradas";
             } else if (usuario.tipoUsuario === "guia") {
@@ -145,6 +159,7 @@
     <div id="registerForm">
         <h2>Registro de Usuario</h2>
         <form onsubmit="registrarUsuario(event)">
+            <div id="mensajeError" class="error-message" style="display:none;"></div>
             <div class="form-group">
                 <label for="nombre">Nombre:</label>
                 <input type="text" id="nombre" required>
@@ -193,6 +208,7 @@
 
 </body>
 </html>
+
 
 
 
