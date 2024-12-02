@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Usuario</title>
+    <title>Registro e Inicio de Sesión</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -48,6 +48,7 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            margin-bottom: 10px;
         }
         button:hover {
             background-color: #45a049;
@@ -61,8 +62,27 @@
             text-align: center;
             margin-top: 10px;
         }
+        .switch-container {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .switch-container button {
+            background-color: #008CBA;
+        }
+        .switch-container button:hover {
+            background-color: #007BB5;
+        }
     </style>
     <script>
+        let isRegisterMode = true;
+
+        function toggleMode() {
+            isRegisterMode = !isRegisterMode;
+            document.getElementById("registerForm").style.display = isRegisterMode ? "block" : "none";
+            document.getElementById("loginForm").style.display = isRegisterMode ? "none" : "block";
+        }
+
         function mostrarCamposAdicionales() {
             const tipoUsuario = document.getElementById("tipoUsuario").value;
             const camposTurista = document.getElementById("camposTurista");
@@ -119,11 +139,28 @@
                 document.getElementById("mensajeCumple").innerText = "";
             }
 
-            // Redirigir según el tipo de usuario
-            if (tipoUsuario === "turista") {
-                window.location.href = "https://hyordi12.github.io/Turista/#1-%C2%BFqu%C3%A9-es-las-coloradas";
-            } else if (tipoUsuario === "guia") {
-                window.location.href = "https://hyordi12.github.io/Guia/";
+            alert("Registro exitoso.");
+            toggleMode();
+        }
+
+        function iniciarSesion(event) {
+            event.preventDefault();
+
+            const email = document.getElementById("loginEmail").value;
+            const password = document.getElementById("loginPassword").value;
+
+            const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+            const usuario = usuarios.find(u => u.email === email && u.password === password);
+
+            if (usuario) {
+                alert(`Bienvenido, ${usuario.nombre}!`);
+                if (usuario.tipoUsuario === "turista") {
+                    window.location.href = "https://hyordi12.github.io/Turista/#1-%C2%BFqu%C3%A9-es-las-coloradas";
+                } else if (usuario.tipoUsuario === "guia") {
+                    window.location.href = "https://hyordi12.github.io/Guia/";
+                }
+            } else {
+                alert("Correo o contraseña incorrectos.");
             }
         }
     </script>
@@ -131,62 +168,75 @@
 <body>
 
 <div class="container">
-    <h2>Registro de Usuario</h2>
-    <form onsubmit="registrarUsuario(event)">
-        <div class="form-group">
-            <label for="nombre">Nombre:</label>
-            <input type="text" id="nombre" required>
-        </div>
-
-        <div class="form-group">
-            <label for="fechaNacimiento">Fecha de Nacimiento:</label>
-            <input type="date" id="fechaNacimiento" required>
-        </div>
-
-        <div class="form-group">
-            <label for="email">Correo Electrónico:</label>
-            <input type="email" id="email" required>
-        </div>
-
-        <div class="form-group">
-            <label for="password">Contraseña:</label>
-            <input type="password" id="password" required>
-        </div>
-
-        <div class="form-group">
-            <label for="tipoUsuario">Tipo de Usuario:</label>
-            <select id="tipoUsuario" onchange="mostrarCamposAdicionales()" required>
-                <option value="">Seleccione una opción</option>
-                <option value="turista">Turista</option>
-                <option value="guia">Guía</option>
-            </select>
-        </div>
-
-        <!-- Campos adicionales para Turista -->
-        <div id="camposTurista" class="extra-fields">
+    <div id="registerForm">
+        <h2>Registro de Usuario</h2>
+        <form onsubmit="registrarUsuario(event)">
             <div class="form-group">
-                <label for="nacionalidad">Nacionalidad:</label>
-                <input type="text" id="nacionalidad">
-            </div>
-        </div>
-
-        <!-- Campos adicionales para Guía -->
-        <div id="camposGuia" class="extra-fields">
-            <div class="form-group">
-                <label for="experiencia">Años de Experiencia:</label>
-                <input type="number" id="experiencia" min="0">
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" required>
             </div>
             <div class="form-group">
-                <label for="idiomas">Idiomas:</label>
-                <input type="text" id="idiomas" placeholder="Ej: Español, Inglés">
+                <label for="fechaNacimiento">Fecha de Nacimiento:</label>
+                <input type="date" id="fechaNacimiento" required>
             </div>
-        </div>
+            <div class="form-group">
+                <label for="email">Correo Electrónico:</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" required>
+            </div>
+            <div class="form-group">
+                <label for="tipoUsuario">Tipo de Usuario:</label>
+                <select id="tipoUsuario" onchange="mostrarCamposAdicionales()" required>
+                    <option value="">Seleccione una opción</option>
+                    <option value="turista">Turista</option>
+                    <option value="guia">Guía</option>
+                </select>
+            </div>
+            <div id="camposTurista" class="extra-fields">
+                <div class="form-group">
+                    <label for="nacionalidad">Nacionalidad:</label>
+                    <input type="text" id="nacionalidad">
+                </div>
+            </div>
+            <div id="camposGuia" class="extra-fields">
+                <div class="form-group">
+                    <label for="experiencia">Años de Experiencia:</label>
+                    <input type="number" id="experiencia" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="idiomas">Idiomas:</label>
+                    <input type="text" id="idiomas" placeholder="Ej: Español, Inglés">
+                </div>
+            </div>
+            <button type="submit">Registrarse</button>
+        </form>
+    </div>
 
-        <button type="submit">Registrarse</button>
-    </form>
+    <div id="loginForm" style="display: none;">
+        <h2>Iniciar Sesión</h2>
+        <form onsubmit="iniciarSesion(event)">
+            <div class="form-group">
+                <label for="loginEmail">Correo Electrónico:</label>
+                <input type="email" id="loginEmail" required>
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Contraseña:</label>
+                <input type="password" id="loginPassword" required>
+            </div>
+            <button type="submit">Iniciar Sesión</button>
+        </form>
+    </div>
+
+    <div class="switch-container">
+        <button onclick="toggleMode()">¿Ya tienes cuenta? Inicia Sesión</button>
+    </div>
     <div id="mensajeCumple" class="mensaje-cumple"></div>
 </div>
 
 </body>
 </html>
+
 
