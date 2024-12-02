@@ -54,11 +54,6 @@
         button:hover {
             background-color: #45a049;
         }
-        .switch-container {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 14px;
-        }
         .hidden {
             display: none;
         }
@@ -75,12 +70,6 @@
             isRegisterMode = !isRegisterMode;
             document.getElementById("registerForm").style.display = isRegisterMode ? "block" : "none";
             document.getElementById("loginForm").style.display = isRegisterMode ? "none" : "block";
-        }
-
-        function mostrarCamposAdicionales() {
-            const tipoUsuario = document.getElementById("tipoUsuario").value;
-            document.getElementById("camposTurista").style.display = tipoUsuario === "turista" ? "block" : "none";
-            document.getElementById("camposGuia").style.display = tipoUsuario === "guia" ? "block" : "none";
         }
 
         function registrarUsuario(event) {
@@ -136,12 +125,13 @@
             document.body.innerHTML = `
                 <div class="container">
                     <p id="birthdayMessage">¡Feliz cumpleaños, ${usuario.nombre}!</p>
-                    <button onclick="redirigirSegunTipo(${JSON.stringify(usuario)})">Continuar</button>
+                    <button onclick="redirigirSegunTipo('${JSON.stringify(usuario).replace(/'/g, "\\'")}')">Continuar</button>
                 </div>
             `;
         }
 
         function redirigirSegunTipo(usuario) {
+            usuario = JSON.parse(usuario);
             if (usuario.tipoUsuario === "turista") {
                 window.location.href = "https://hyordi12.github.io/Turista/#1-%C2%BFqu%C3%A9-es-las-coloradas";
             } else if (usuario.tipoUsuario === "guia") {
@@ -174,23 +164,11 @@
             </div>
             <div class="form-group">
                 <label for="tipoUsuario">Tipo de Usuario:</label>
-                <select id="tipoUsuario" onchange="mostrarCamposAdicionales()" required>
+                <select id="tipoUsuario" required>
                     <option value="">Seleccione una opción</option>
                     <option value="turista">Turista</option>
                     <option value="guia">Guía</option>
                 </select>
-            </div>
-            <div id="camposTurista" class="hidden">
-                <div class="form-group">
-                    <label for="nacionalidad">Nacionalidad:</label>
-                    <input type="text" id="nacionalidad">
-                </div>
-            </div>
-            <div id="camposGuia" class="hidden">
-                <div class="form-group">
-                    <label for="experiencia">Años de Experiencia:</label>
-                    <input type="number" id="experiencia" min="0">
-                </div>
             </div>
             <button type="submit">Registrarse</button>
         </form>
@@ -218,6 +196,8 @@
 
 </body>
 </html>
+
+
 
 
 
